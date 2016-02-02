@@ -173,7 +173,61 @@ var Aria = require("../Aria");
                     }
                 }
                 return output;
+            },
+
+            /**
+             * Apply a callback function on each element in an array and return
+             * a new array from the results.
+             * @param {Array} array Array to iterate.
+             * @param {Function} Function to apply on each element of the array. This function receive as arguments the
+             * value, the index and the array.
+             * @param {Object} thisObject Object to use as this when executing callback.
+             * @return {Array}
+             */
+            map : (!arrayPrototype.filter) ? function (array, callback, thisObject) {
+
+                // clone array to avoid mutation when executing the callback
+                var workArray = arrayUtils.clone(array);
+
+                var res = [];
+                thisObject = thisObject || array;
+                var len = workArray.length;
+                for (var i = 0; i < len; i++) {
+                    var val = workArray[i];
+                    res.push(callback.call(thisObject, val, i, array));
+                }
+                return res;
+            } : function (array, callback, thisObject) {
+                thisObject = thisObject || array;
+                return array.map(callback, thisObject);
+            },
+
+            /**
+             * Apply a callback function on each element in an array and return
+             * a new array from the results.
+             * @param {Array} array Array to iterate.
+             * @param {Function} Function to apply on each element of the array. This function receive as arguments the
+             * value, the index and the array.
+             * @param {Object} thisObject Object to use as this when executing callback.
+             * @return {Array}
+             */
+            reduce : (!arrayPrototype.reduce) ? function (array, callback, initialValue) {
+
+                // clone array to avoid mutation when executing the callback
+                var workArray = arrayUtils.clone(array);
+                var len = workArray.length, i = 0;
+                var res = initialValue || workArray[i++];
+
+                while (i < len) {
+                    var val = workArray[i];
+                    res = callback(res, val, i, array);
+                    i++;
+                }
+                return res;
+            } : function (array, callback, initialValue) {
+                return array.reduce(callback, initialValue);
             }
+
         }
     });
 
